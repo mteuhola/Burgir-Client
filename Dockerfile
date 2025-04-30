@@ -5,7 +5,13 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
+RUN npm install react-router-dom axios framer-motion
+RUN npm install -D tailwindcss postcss autoprefixer
+
+RUN npx tailwindcss init -p
+
 COPY . .
+
 RUN npm run build
 
 FROM node:18-alpine
