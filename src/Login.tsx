@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE } from './config';
+
 import axios from 'axios';
 
 const Login: React.FC = () => {
@@ -15,7 +17,7 @@ const Login: React.FC = () => {
     let url = '/api/users/';
 
     while (url) {
-      const response = await axios.get(url);
+      const response = await axios.get(`${API_BASE}${url}`);
       allUsers = [...allUsers, ...response.data.results];
       url = response.data.next ? response.data.next.replace('https://burgirs.2.rahtiapp.fi', '') : '';
     }
@@ -42,7 +44,7 @@ const Login: React.FC = () => {
         if (foundUser) {
           setError('Username already taken.');
         } else {
-          const createResponse = await axios.post('/api/users/', { name: username },  {
+          const createResponse = await axios.post(`${API_BASE}/api/users/`, { name: username },  {
             headers: {
               'Content-Type': 'application/json',
             },

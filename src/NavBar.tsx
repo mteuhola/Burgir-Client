@@ -13,7 +13,7 @@ const NavBar: React.FC = () => {
     } else {
       setUser(null);
     }
-  }, [location]); // 👈 Depend on location!
+  }, [location]);
 
   const handleLogout = () => {
     localStorage.removeItem('user');

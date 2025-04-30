@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { API_BASE } from './config';
 import axios from 'axios';
 
 interface MenuItem {
@@ -41,7 +42,7 @@ const Orders: React.FC = () => {
         let url = '/api/menu-items/';
 
         while (url) {
-          const response = await axios.get(url);
+          const response = await axios.get(`${API_BASE}${url}`);
           allItems = [...allItems, ...response.data.results];
           url = response.data.next ? response.data.next.replace('https://burgirs.2.rahtiapp.fi', '') : '';
         }
@@ -85,7 +86,7 @@ const Orders: React.FC = () => {
     if (!amount || amount <= 0) return;
 
     try {
-      const response = await axios.post('/api/order-items/', {
+      const response = await axios.post(`${API_BASE}/api/order-items/`, {
         item_id: item.id,
         amount,
       });
@@ -116,7 +117,7 @@ const Orders: React.FC = () => {
     setPlacingOrder(true);
     const order_items = cart.map(item => item.id);
     try {
-      const response = await axios.post('/api/orders/', {
+      const response = await axios.post(`${API_BASE}/api/orders/`, {
         status: "pending",
         user_id: user.id,
         order_items: order_items,
@@ -146,7 +147,7 @@ const Orders: React.FC = () => {
       let url = '/api/orders/';
 
       while (url) {
-        const response = await axios.get(url);
+        const response = await axios.get(`${API_BASE}${url}`);
         allOrders = [...allOrders, ...response.data.results];
         url = response.data.next ? response.data.next.replace('https://burgirs.2.rahtiapp.fi', '') : '';
       }
@@ -160,7 +161,7 @@ const Orders: React.FC = () => {
       let itemUrl = '/api/order-items/';
 
       while (itemUrl) {
-        const res = await axios.get(itemUrl);
+        const res = await axios.get(`${API_BASE}${itemUrl}`);
         items = [...items, ...res.data.results];
         itemUrl = res.data.next ? res.data.next.replace('https://burgirs.2.rahtiapp.fi', '') : '';
       }

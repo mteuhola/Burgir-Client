@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { API_BASE } from './config';
 import axios from 'axios';
 
 interface MenuItem {
@@ -8,13 +9,6 @@ interface MenuItem {
   description: string;
   type: string;
   price: number;
-}
-
-interface MenuApiResponse {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: MenuItem[];
 }
 
 const categoryOrder = ["appetizer", "main course", "drink", "snack", "dessert"];
@@ -46,7 +40,7 @@ const Menu: React.FC = () => {
     
       try {
         while (url) {
-          const response = await axios.get<MenuApiResponse>(url);
+          const response = await axios.get(`${API_BASE}${url}`);
           allItems = [...allItems, ...response.data.results];
           url = response.data.next ? response.data.next.replace('https://burgirs.2.rahtiapp.fi', '') : ''; // adjust next page URL
         }
