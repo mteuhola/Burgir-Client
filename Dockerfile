@@ -8,16 +8,14 @@ RUN npm install
 COPY . .
 RUN npm run build
 
-FROM nginx:stable-alpine
+FROM node:18-alpine
 
-RUN rm -rf /usr/share/nginx/html/*
+WORKDIR /app
 
-COPY --from=builder /app/dist /usr/share/nginx/html
+RUN npm install -g serve
 
-RUN adduser -D -g 'nginx' nginxuser && \
-    chown -R nginxuser:nginx /usr/share/nginx/html
+COPY --from=builder /app/build /app/build
 
-USER nginxuser
+EXPOSE 3000
 
-EXPOSE 8080
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["serve", "-s", "build", "-l", "3000"]
