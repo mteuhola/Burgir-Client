@@ -3,6 +3,7 @@ import Home from "./Home";
 import Menu from './Menu';
 import Login from './Login';
 import Reservations from './Reservations';
+import MyReservations from './MyReservations';
 import Orders from './Orders';
 import NavBar from './NavBar';
 
@@ -15,6 +16,7 @@ const App: React.FC = () => {
       <Route path="/menu" element={<Menu />} />
       <Route path="/login" element={<Login />} />
       <Route path="/reservations" element={<Reservations />} />
+      <Route path="/my-reservations" element={<MyReservations />} />
       <Route path="/orders" element={<Orders />} />
     </Routes>
     </>
