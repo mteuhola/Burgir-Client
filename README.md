@@ -37,3 +37,33 @@ framer-motion: enables smooth animations
 ```bash
 npm run dev
 ```
+
+4. Set up ESLint (done already in repository, but just instructions on how this was done)
+
+This project uses ESLint linter to find code issues.
+
+Installation instructions from https://typescript-eslint.io/getting-started/#quickstart:
+
+Open a terminal at the project root, and run
+```
+npm install --save-dev eslint @eslint/js typescript typescript-eslint
+```
+Create a file called 
+```eslint.config.mjs```
+to project root, and set this to its content:
+``` ts
+// @ts-check
+
+import eslint from '@eslint/js';
+import tseslint from 'typescript-eslint';
+
+export default tseslint.config(
+  eslint.configs.recommended,
+  tseslint.configs.recommended,
+);
+```
+Run ESLint with:
+```
+npx eslint .
+```
+**At any moment of pushing changes to this repository, there should not be any issues printed out by ESLint!**
