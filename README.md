@@ -10,7 +10,7 @@ node --version
 At least v16.00 should be displayed for this project to work properly. If a suitable version isn't found, it can be installed for example from the node website: https://nodejs.org/en/download
 
 2. Install packages:
-At least these packages must be installed, as the project utilizes them:
+At least these packages must be installed in the project directory, as the project utilizes them:
 ```bash
 npm install react-router-dom
 npm install axios
