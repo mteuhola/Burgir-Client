@@ -33,7 +33,7 @@ autoprefixer: parses CSS and automatically applies vendor prefixes to CSS rules
 
 framer-motion: enables smooth animations
 
-4. Run the server
+3. Run the server
 ```bash
 npm run dev
 ```
