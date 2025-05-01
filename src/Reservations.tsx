@@ -58,7 +58,7 @@ const ReservationForm: React.FC = () => {
   const generateTimeSlots = (startHour = openingHours.start, endHour = openingHours.end - 2) => {
     const slots: string[] = [];
     for (let hour = startHour; hour < endHour; hour++) {
-      for (let min of [0, 30]) {
+      for (const min of [0, 30]) {
         const h = hour.toString().padStart(2, '0');
         const m = min.toString().padStart(2, '0');
         slots.push(`${h}:${m}`);

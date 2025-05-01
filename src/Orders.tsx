@@ -2,6 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { API_BASE } from './config';
 import axios from 'axios';
 
+interface Order {
+  id: number;
+  user_id: number;
+  status: string;
+  order_items: number[];
+}
+
 interface MenuItem {
   id: number;
   name: string;
@@ -25,7 +32,7 @@ const Orders: React.FC = () => {
   const [groupedItems, setGroupedItems] = useState<GroupedItems>({});
   const [quantities, setQuantities] = useState<Record<number, number>>({});
   const [cart, setCart] = useState<OrderItem[]>([]);
-  const [userOrders, setUserOrders] = useState<any[]>([]);
+  const [userOrders, setUserOrders] = useState<Order[]>([]);
   const [allOrderItems, setAllOrderItems] = useState<OrderItem[]>([]);
   const [viewingOrders, setViewingOrders] = useState(false);
   const [expandedOrderId, setExpandedOrderId] = useState<number | null>(null);
@@ -143,7 +150,7 @@ const Orders: React.FC = () => {
     const user = JSON.parse(storedUser);
 
     try {
-      let allOrders: any[] = [];
+      let allOrders: Order[] = [];
       let url = '/api/orders/';
 
       while (url) {

@@ -4,6 +4,11 @@ import { API_BASE } from './config';
 
 import axios from 'axios';
 
+interface User {
+  id: number;
+  name: string;
+}
+
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -12,8 +17,8 @@ const Login: React.FC = () => {
 
   const navigate = useNavigate();
 
-  const fetchAllUsers = async () => {
-    let allUsers: any[] = [];
+  const fetchAllUsers = async (): Promise<User[]> => {
+    let allUsers: User[] = [];
     let url = '/api/users/';
 
     while (url) {
@@ -37,7 +42,7 @@ const Login: React.FC = () => {
     try {
       const users = await fetchAllUsers();
 
-      const foundUser = users.find((user: any) => user.name.toLowerCase() === username.toLowerCase());
+      const foundUser = users.find((user: User) => user.name.toLowerCase() === username.toLowerCase());
 
       if (isSignUp) {
         // SIGN UP flow
