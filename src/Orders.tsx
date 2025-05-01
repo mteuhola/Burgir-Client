@@ -151,16 +151,11 @@ const Orders: React.FC = () => {
 
     try {
       let allOrders: Order[] = [];
-      let url = '/api/orders/';
+      let url = `/api/users/${user.id}/orders/`;
 
-      while (url) {
-        const response = await axios.get(`${API_BASE}${url}`);
-        allOrders = [...allOrders, ...response.data.results];
-        url = response.data.next ? response.data.next.replace('https://burgirs.2.rahtiapp.fi', '') : '';
-      }
-
-      const myOrders = allOrders.filter(order => order.user_id === user.id);
-      setUserOrders(myOrders);
+      const response = await axios.get(`${API_BASE}${url}`);
+      allOrders = [...allOrders, ...response.data];
+      setUserOrders(allOrders);
       setViewingOrders(true);
 
       // Fetch all order items

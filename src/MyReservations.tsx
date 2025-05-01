@@ -30,13 +30,10 @@ const MyReservations: React.FC = () => {
       try {
         // Fetch all reservations
         let userRes: Reservation[] = [];
-        let url = 'api/reservations/';
-        while (url) {
-          const res = await axios.get(`${API_BASE}${url}`);
-          const data = res.data.results || res.data;
-          userRes = [...userRes, ...data.filter((r: Reservation) => r.user === user.id)];
-          url = res.data.next ? res.data.next.replace('https://burgirs.2.rahtiapp.fi', '') : '';
-        }
+        let url = `api/users/${user.id}/reservations/`;
+
+        const res = await axios.get(`${API_BASE}${url}`);
+        userRes = res.data;
 
         // Sort reservations descending (most recent first)
         userRes.sort((a, b) => new Date(b.date_and_time).getTime() - new Date(a.date_and_time).getTime());

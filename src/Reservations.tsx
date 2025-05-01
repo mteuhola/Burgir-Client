@@ -35,12 +35,12 @@ const ReservationForm: React.FC = () => {
     const fetchTablesAndReservations = async () => {
       try {
         const [tableRes, reservationRes] = await Promise.all([
-          axios.get(`${API_BASE}/api/tables/`),
-          axios.get(`${API_BASE}/api/reservations/`)
+          fetchAllPaginated(`/api/tables/`),
+          fetchAllPaginated(`/api/reservations/`)
         ]);
 
-        setTables(tableRes.data.results || tableRes.data);
-        setReservations(reservationRes.data.results || reservationRes.data);
+        setTables(tableRes);
+        setReservations(reservationRes);
       } catch (err) {
         console.error('Failed to fetch data:', err);
         setError('Could not load reservation data.');
@@ -49,6 +49,27 @@ const ReservationForm: React.FC = () => {
 
     fetchTablesAndReservations();
   }, []);
+
+  const fetchAllPaginated = async (endpoint: string) => {
+    let results: any[] = [];
+    let url = `${API_BASE}${endpoint}`;
+  
+    while (url) {
+      const res = await axios.get(url);
+      const data = res.data;
+      if (Array.isArray(data)) {
+        results = [...results, ...data];
+        break;
+      } else if (Array.isArray(data.results)) {
+        results = [...results, ...data.results];
+        url = data.next ? data.next.replace('https://burgirs.2.rahtiapp.fi', '') : '';
+      } else {
+        console.error('Unexpected API response:', data);
+        break;
+      }
+    }
+    return results;
+  };
 
   const parseDuration = (durationStr: string): number => {
     const [h, m, s] = durationStr.split(':').map(Number);
@@ -83,6 +104,15 @@ const ReservationForm: React.FC = () => {
 
     if (!date || !time) {
       setError('Please select both date and time.');
+      setLoading(false);
+      return;
+    }
+
+    const now = new Date();
+    const requestedDateTime = new Date(`${date}T${time}:00`);
+
+    if (requestedDateTime < now) {
+      setError('You cannot make a reservation in the past.');
       setLoading(false);
       return;
     }
@@ -127,8 +157,10 @@ const ReservationForm: React.FC = () => {
         date_and_time: dateTimeStr,
         duration: duration
       });
-
+    
       setMessage(`✅ Reserved table #${foundTable.id} on ${date} at ${time}`);
+      const updatedReservations = await fetchAllPaginated('/api/reservations/');
+      setReservations(updatedReservations);
     } catch (err) {
       console.error('Reservation failed:', err);
       setError('Reservation failed. Try again.');
@@ -171,6 +203,7 @@ const ReservationForm: React.FC = () => {
         type="date"
         value={date}
         onChange={(e) => setDate(e.target.value)}
+        min={new Date().toISOString().split('T')[0]}
         className="w-full p-2 mb-4 border rounded"
       />
 
