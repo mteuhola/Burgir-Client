@@ -28,6 +28,7 @@ interface GroupedItems {
 }
 
 const Orders: React.FC = () => {
+  // Define the state variables for menu items, grouped items, quantities, cart, user orders, and order items
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [groupedItems, setGroupedItems] = useState<GroupedItems>({});
   const [quantities, setQuantities] = useState<Record<number, number>>({});
@@ -44,6 +45,13 @@ const Orders: React.FC = () => {
 
   useEffect(() => {
     const fetchMenuItems = async () => {
+      // Check if user is logged in
+      const storedUser = localStorage.getItem('user');
+        if (!storedUser) {
+          setError('You must be logged in to place an order.');
+          return;
+        }
+      
       try {
         let allItems: MenuItem[] = [];
         let url = '/api/menu-items/';
@@ -75,6 +83,7 @@ const Orders: React.FC = () => {
   }, []);
 
   const increaseQuantity = (itemId: number) => {
+    // Increase amount of item, prevent negative quantities
     setQuantities(prev => ({
       ...prev,
       [itemId]: (prev[itemId] || 0) + 1
@@ -82,6 +91,7 @@ const Orders: React.FC = () => {
   };
 
   const decreaseQuantity = (itemId: number) => {
+    // Decrease amount of item, prevent negative quantities
     setQuantities(prev => ({
       ...prev,
       [itemId]: Math.max((prev[itemId] || 0) - 1, 0)
@@ -89,6 +99,7 @@ const Orders: React.FC = () => {
   };
 
   const addToCart = async (item: MenuItem) => {
+    // Add item to cart, send POST request to API
     const amount = quantities[item.id];
     if (!amount || amount <= 0) return;
 
@@ -106,11 +117,19 @@ const Orders: React.FC = () => {
     }
   };
 
-  const removeFromCart = (orderItemId: number) => {
+  const removeFromCart = async (orderItemId: number) => {
+    // Remove item from cart
+    try {
+      await axios.delete(`${API_BASE}/api/order-items/${orderItemId}/`);
+    } catch (err) {
+      console.error('Failed to remove item from cart:', err);
+      alert('Failed to remove item from cart.');
+    }
     setCart(prev => prev.filter(item => item.id !== orderItemId));
   };
 
   const placeOrder = async () => {
+    // Place order, send POST request to API
     if (cart.length === 0) return;
 
     const storedUser = localStorage.getItem('user');
@@ -141,6 +160,7 @@ const Orders: React.FC = () => {
   };
 
   const fetchUserOrders = async () => {
+    // Fetch user orders, send GET request to API
     const storedUser = localStorage.getItem('user');
     if (!storedUser) {
       setError('You must be logged in to view your orders.');
@@ -151,7 +171,7 @@ const Orders: React.FC = () => {
 
     try {
       let allOrders: Order[] = [];
-      let url = `/api/users/${user.id}/orders/`;
+      const url = `/api/users/${user.id}/orders/`;
 
       const response = await axios.get(`${API_BASE}${url}`);
       allOrders = [...allOrders, ...response.data];
@@ -176,10 +196,12 @@ const Orders: React.FC = () => {
   };
 
   const toggleExpand = (orderId: number) => {
+    // Toggle expanded order details
     setExpandedOrderId(prev => (prev === orderId ? null : orderId));
   };
 
   const findMenuItem = (itemId: number) => {
+    // Find menu item by ID
     return menuItems.find(m => m.id === itemId);
   };
 
@@ -187,6 +209,7 @@ const Orders: React.FC = () => {
   if (error) return <div className="min-h-screen flex justify-center items-center text-red-500">{error}</div>;
 
   return (
+    // Main component rendering
     <div className="p-8 flex flex-col items-center">
       <div className="mb-6">
         <button

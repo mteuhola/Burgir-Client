@@ -13,12 +13,21 @@ interface Reservation {
 }
 
 const MyReservations: React.FC = () => {
+  // Define the state variables for reservations, loading, error, and deleting reservation
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
   useEffect(() => {
+    // Check if user is logged in
+    // If not, set error message and return
+    const storedUser = localStorage.getItem('user');
+    if (!storedUser) {
+      setError('You must be logged in to view reservations.');
+      return;
+    }
+
     const fetchReservations = async () => {
       const user = JSON.parse(localStorage.getItem('user') || '{}');
       if (!user?.id) {
@@ -30,7 +39,7 @@ const MyReservations: React.FC = () => {
       try {
         // Fetch all reservations
         let userRes: Reservation[] = [];
-        let url = `api/users/${user.id}/reservations/`;
+        const url = `api/users/${user.id}/reservations/`;
 
         const res = await axios.get(`${API_BASE}${url}`);
         userRes = res.data;
@@ -51,15 +60,18 @@ const MyReservations: React.FC = () => {
   }, []);
 
   const formatDate = (iso: string) => new Date(iso).toLocaleString(undefined, {
+    // Format date and time
     dateStyle: 'medium',
     timeStyle: 'short'
   });
 
   const isUpcoming = (iso: string) => {
+    // Check if the reservation date is in the future
     return new Date(iso) > new Date();
   };
 
   const cancelReservation = async (id: number) => {
+    // Confirm cancellation and delete reservation
     if (!window.confirm("Are you sure you want to cancel this reservation?")) return;
 
     try {
@@ -73,6 +85,8 @@ const MyReservations: React.FC = () => {
       setDeletingId(null);
     }
   };
+
+  if (error) return <div className="min-h-screen flex justify-center items-center text-red-500">{error}</div>;
 
   return (
     <div className="max-w-3xl mx-auto mt-10 bg-white p-6 shadow rounded-xl">

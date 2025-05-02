@@ -2,11 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 const Home: React.FC = () => {
+  // State to manage user login status
+  // and user information
   const [user, setUser] = useState<{ id: number; name: string } | null>(null);
   const navigate = useNavigate();
-  const location = useLocation(); // 👈 NEW
+  const location = useLocation();
 
   useEffect(() => {
+    // Check if user is logged in by checking localStorage
+    // and set the user state accordingly
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
@@ -16,7 +20,10 @@ const Home: React.FC = () => {
   }, [location]); // 👈 Depend on location changes!
 
   const handleLogout = () => {
+    // Clear user data from localStorage and reset user state
+    // Redirect to home page
     localStorage.removeItem('user');
+    localStorage.removeItem('isAdmin');
     setUser(null);
     navigate('/');
   };
@@ -85,6 +92,11 @@ const Home: React.FC = () => {
             </Link>
           </>
         )}
+        <Link to="/admin">
+              <button className="px-6 py-3 bg-gray-250 text-black rounded-2xl hover:bg-gray-400 transition">
+                Admin
+              </button>
+            </Link>
       </div>
     </div>
   );

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { API_BASE } from './config'; // Adjust if needed
+import { API_BASE } from './config';
 import { Link } from 'react-router-dom';
+import { fetchAllPaginated } from './fetchAllPaginated';
 
 interface Table {
   id: number;
@@ -19,6 +20,7 @@ interface Reservation {
 }
 
 const ReservationForm: React.FC = () => {
+  // Define the state variables for number of people, date, time, duration, tables, reservations, message, error, and loading
   const [numberOfPeople, setNumberOfPeople] = useState(2);
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
@@ -32,11 +34,18 @@ const ReservationForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+
+    const storedUser = localStorage.getItem('user');
+    if (!storedUser) {
+      setError('You must be logged in to place a reservation.');
+      return;
+    }
     const fetchTablesAndReservations = async () => {
+      // Fetch all tables and reservations
       try {
         const [tableRes, reservationRes] = await Promise.all([
-          fetchAllPaginated(`/api/tables/`),
-          fetchAllPaginated(`/api/reservations/`)
+          fetchAllPaginated<Table>('/api/tables/'),
+          fetchAllPaginated<Reservation>('/api/reservations/')
         ]);
 
         setTables(tableRes);
@@ -50,33 +59,14 @@ const ReservationForm: React.FC = () => {
     fetchTablesAndReservations();
   }, []);
 
-  const fetchAllPaginated = async (endpoint: string) => {
-    let results: any[] = [];
-    let url = `${API_BASE}${endpoint}`;
-  
-    while (url) {
-      const res = await axios.get(url);
-      const data = res.data;
-      if (Array.isArray(data)) {
-        results = [...results, ...data];
-        break;
-      } else if (Array.isArray(data.results)) {
-        results = [...results, ...data.results];
-        url = data.next ? data.next.replace('https://burgirs.2.rahtiapp.fi', '') : '';
-      } else {
-        console.error('Unexpected API response:', data);
-        break;
-      }
-    }
-    return results;
-  };
-
   const parseDuration = (durationStr: string): number => {
+    // Convert duration string (HH:MM:SS) to milliseconds
     const [h, m, s] = durationStr.split(':').map(Number);
     return ((h * 60 + m) * 60 + s) * 1000;
   };
 
   const generateTimeSlots = (startHour = openingHours.start, endHour = openingHours.end - 2) => {
+    // Generate time slots for reservations
     const slots: string[] = [];
     for (let hour = startHour; hour < endHour; hour++) {
       for (const min of [0, 30]) {
@@ -91,19 +81,29 @@ const ReservationForm: React.FC = () => {
   const timeSlots = generateTimeSlots();
 
   const handleSubmit = async () => {
+    // Handle reservation submission
     setMessage(null);
     setError(null);
     setLoading(true);
 
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     if (!user?.id) {
+      // Check if user is logged in
       setError('You must be logged in to make a reservation.');
       setLoading(false);
       return;
     }
 
     if (!date || !time) {
+      // Check if date and time are selected
       setError('Please select both date and time.');
+      setLoading(false);
+      return;
+    }
+
+    if (numberOfPeople > 10) {
+      // Check if the number of people exceeds the limit
+      setError('For groups larger than 10 people, please contact us!');
       setLoading(false);
       return;
     }
@@ -112,6 +112,7 @@ const ReservationForm: React.FC = () => {
     const requestedDateTime = new Date(`${date}T${time}:00`);
 
     if (requestedDateTime < now) {
+      // Check if the requested date and time are in the past
       setError('You cannot make a reservation in the past.');
       setLoading(false);
       return;
@@ -128,6 +129,7 @@ const ReservationForm: React.FC = () => {
     let foundTable = null;
 
     for (const table of suitableTables) {
+      // Check if the table is available
       const overlapping = reservations.some(res => {
         if (res.table !== table.id) return false;
 
@@ -144,12 +146,14 @@ const ReservationForm: React.FC = () => {
     }
 
     if (!foundTable) {
+      // If no suitable table is found, set error message
       setError('No available table for that time and group size.');
       setLoading(false);
       return;
     }
 
     try {
+      // Create reservation
       await axios.post(`${API_BASE}/api/reservations/`, {
         user: user.id,
         table: foundTable.id,
@@ -159,7 +163,7 @@ const ReservationForm: React.FC = () => {
       });
     
       setMessage(`✅ Reserved table #${foundTable.id} on ${date} at ${time}`);
-      const updatedReservations = await fetchAllPaginated('/api/reservations/');
+      const updatedReservations = await fetchAllPaginated<Reservation>('/api/reservations/');
       setReservations(updatedReservations);
     } catch (err) {
       console.error('Reservation failed:', err);
@@ -168,6 +172,8 @@ const ReservationForm: React.FC = () => {
       setLoading(false);
     }
   };
+
+  if (error=="You must be logged in to place a reservation.") return <div className="min-h-screen flex justify-center items-center text-red-500">{error}</div>;
 
   return (
     

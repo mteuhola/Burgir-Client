@@ -10,6 +10,7 @@ interface User {
 }
 
 const Login: React.FC = () => {
+  // Define the state variables for username, error message, loading state, and sign-up mode
   const [username, setUsername] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -18,6 +19,7 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
 
   const fetchAllUsers = async (): Promise<User[]> => {
+    // Fetch all users from the API
     let allUsers: User[] = [];
     let url = '/api/users/';
 
@@ -31,6 +33,7 @@ const Login: React.FC = () => {
   };
 
   const handleLoginOrSignUp = async () => {
+    // Handle login or sign-up based on the mode
     if (!username.trim()) {
       setError('Please enter a name');
       return;
@@ -56,12 +59,14 @@ const Login: React.FC = () => {
           });
           console.log(createResponse.data)
           localStorage.setItem('user', JSON.stringify(createResponse.data));
+          localStorage.removeItem('isAdmin');
           navigate('/');
         }
       } else {
         // LOGIN flow
         if (foundUser) {
           localStorage.setItem('user', JSON.stringify(foundUser));
+          localStorage.removeItem('isAdmin');
           navigate('/');
         } else {
           setError('User not found.');

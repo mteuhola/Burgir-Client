@@ -14,6 +14,7 @@ interface MenuItem {
 const categoryOrder = ["appetizer", "main course", "drink", "snack", "dessert"];
 
 const categoryIcons: Record<string, string> = {
+  // Icons for each category
   appetizer: "🥟",
   "main course": "🍽️",
   drink: "🥤",
@@ -22,6 +23,7 @@ const categoryIcons: Record<string, string> = {
 };
 
 const formatCategoryName = (str: string) => {
+  // Convert hyphenated names to space-separated and capitalize each word
   return str
     .split(' ')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -29,11 +31,13 @@ const formatCategoryName = (str: string) => {
 };
 
 const Menu: React.FC = () => {
+  // Define the state variables for menu items, loading state, and error handling
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Check if the user is an admin
     const fetchAllMenuItems = async () => {
       let allItems: MenuItem[] = [];
       let url = '/api/menu-items/';
