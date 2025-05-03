@@ -205,8 +205,8 @@ const Orders: React.FC = () => {
     return menuItems.find(m => m.id === itemId);
   };
 
+  if (error == 'You must be logged in to place an order.') return <div className="min-h-screen flex justify-center items-center text-red-500">{error}</div>;
   if (loading) return <div className="min-h-screen flex justify-center items-center">Loading menu...</div>;
-  if (error) return <div className="min-h-screen flex justify-center items-center text-red-500">{error}</div>;
 
   return (
     // Main component rendering
