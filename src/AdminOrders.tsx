@@ -137,7 +137,7 @@ const AdminOrders: React.FC = () => {
           </div>
 
           <div className="pl-2 border-l-4 border-blue-400">
-            {order.order_items.map(id => {
+            {order.order_items?.map(id => {
               const oi = findOrderItem(id);
               const mi = oi ? findMenuItem(oi.item_id) : null;
               return oi && mi ? (

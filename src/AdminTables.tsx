@@ -31,9 +31,9 @@ const AdminTables: React.FC = () => {
     // Fetch all tables from the API
     try {
       let all: Table[] = [];
-      let url = `${API_BASE}/api/tables/`;
+      let url = `/api/tables/`;
       while (url) {
-        const res = await axios.get(url);
+        const res = await axios.get(`${API_BASE}${url}`);
         all = [...all, ...(res.data.results || res.data)];
         url = res.data.next ? res.data.next.replace('https://burgirs.2.rahtiapp.fi', '') : '';
       }
