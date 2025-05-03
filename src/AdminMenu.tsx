@@ -39,9 +39,9 @@ const AdminMenu: React.FC = () => {
     // Fetch all menu items from the API
     try {
       let allItems: MenuItem[] = [];
-      let url = `${API_BASE}/api/menu-items/`;
+      let url = `/api/menu-items/`;
       while (url) {
-        const res = await axios.get(url);
+        const res = await axios.get(`${API_BASE}${url}`);
         allItems = [...allItems, ...(res.data.results || res.data)];
         url = res.data.next ? res.data.next.replace('https://burgirs.2.rahtiapp.fi', '') : '';
       }
