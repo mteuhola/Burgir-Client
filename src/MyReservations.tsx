@@ -39,7 +39,7 @@ const MyReservations: React.FC = () => {
       try {
         // Fetch all reservations
         let userRes: Reservation[] = [];
-        const url = `api/users/${user.id}/reservations/`;
+        const url = `/api/users/${user.id}/reservations/`;
 
         const res = await axios.get(`${API_BASE}${url}`);
         userRes = res.data;
